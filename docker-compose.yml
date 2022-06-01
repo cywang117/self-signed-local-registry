@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    restart: always
+    container_name: registry
+    depends_on:
+      - htpasswd
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./registry:/var/lib/registry
+      - ./certs:/certs
+      - ./auth:/auth
+    networks:
+      - registry
+    environment:
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: 'Registry Realm'
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+  # Generate auth credentials for local registry. Run `docker-compose up -d registry`
+  # if you already have a valid passwd file and do not want to generate another password.
+  # Note that every time this service runs, it will replace the current user and password
+  htpasswd:
+    image: httpd:2
+    restart: 'no'
+    container_name: htpasswd
+    # Replace 'testuser' & 'testpassword' accordingly
+    command: htpasswd -Bbc /auth/htpasswd testuser testpassword
+    volumes:
+      - ./auth:/auth
+    networks:
+      - registry
+
+networks:
+  registry:
+    driver: bridge
+    name: registry
