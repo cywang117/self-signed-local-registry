@@ -61,7 +61,7 @@ docker push $LOCAL_IP:5000/$IMAGE
 
 ```bash
 # Login to local registry
-docker login $LOCAL_IP:5000 -u testuser -p testpassword
+balena login $LOCAL_IP:5000 -u testuser -p testpassword
 # Pull image from local registry
 balena pull $LOCAL_IP:5000/$IMAGE
 # Tag image in a way the Supervisor recognizes
